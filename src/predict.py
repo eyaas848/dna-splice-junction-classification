@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from tensorflow.keras.models import load_model
 
-from features import one_hot_encode_sequence
+from src.features import one_hot_encode_sequence
 
 
 CLASS_NAMES = {
@@ -55,6 +55,12 @@ def predict_sequence(sequence):
     if not sequence:
         raise ValueError(
             "Please enter a DNA sequence."
+        )
+    
+    if len(sequence) != 60:
+        raise ValueError(
+            f"Please enter exactly 60 DNA bases. "
+            f"Your sequence contains {len(sequence)} bases."
         )
 
     model = load_cnn_model()

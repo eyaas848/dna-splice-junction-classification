@@ -1,0 +1,71 @@
+{
+    "logistic_regression": {
+        "accuracy": 0.5470219435736677,
+        "precision_weighted": 0.5661750948431109,
+        "recall_weighted": 0.5470219435736677,
+        "f1_weighted": 0.4598459671679312,
+        "confusion_matrix": [
+            [
+                18,
+                2,
+                133
+            ],
+            [
+                3,
+                23,
+                128
+            ],
+            [
+                10,
+                13,
+                308
+            ]
+        ]
+    },
+    "random_forest": {
+        "accuracy": 0.6896551724137931,
+        "precision_weighted": 0.7077862612359141,
+        "recall_weighted": 0.6896551724137931,
+        "f1_weighted": 0.6748892151955371,
+        "confusion_matrix": [
+            [
+                69,
+                4,
+                80
+            ],
+            [
+                4,
+                79,
+                71
+            ],
+            [
+                16,
+                23,
+                292
+            ]
+        ]
+    },
+    "cnn": {
+        "accuracy": 0.8260188087774295,
+        "precision_weighted": 0.8262275448001547,
+        "recall_weighted": 0.8260188087774295,
+        "f1_weighted": 0.8256694447020023,
+        "confusion_matrix": [
+            [
+                124,
+                11,
+                18
+            ],
+            [
+                5,
+                113,
+                36
+            ],
+            [
+                13,
+                28,
+                290
+            ]
+        ]
+    }
+}

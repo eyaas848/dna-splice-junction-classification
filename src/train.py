@@ -3,6 +3,7 @@ import json
 
 import joblib
 import numpy as np
+import matplotlib.pyplot as plt
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -100,6 +101,50 @@ def evaluate_model(name, y_true, y_pred):
     return results
 
 
+def plot_confusion_matrix(
+    matrix,
+    title,
+    output_path
+):
+    """Save a confusion matrix visualization."""
+
+    plt.figure(figsize=(6, 5))
+
+    plt.imshow(matrix)
+
+    plt.title(title)
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+
+    class_names = ["EI", "IE", "N"]
+
+    plt.xticks(
+        range(len(class_names)),
+        class_names
+    )
+
+    plt.yticks(
+        range(len(class_names)),
+        class_names
+    )
+
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            plt.text(
+                j,
+                i,
+                matrix[i][j],
+                ha="center",
+                va="center"
+            )
+
+    plt.tight_layout()
+
+    plt.savefig(output_path)
+
+    plt.close()
+
+
 def build_cnn(input_shape, num_classes=3):
     """Build the 1D CNN model."""
 
@@ -113,7 +158,9 @@ def build_cnn(input_shape, num_classes=3):
 
         BatchNormalization(),
 
-        MaxPooling1D(pool_size=2),
+        MaxPooling1D(
+            pool_size=2
+        ),
 
         Conv1D(
             128,
@@ -150,6 +197,7 @@ def build_cnn(input_shape, num_classes=3):
 def main():
 
     project_root = Path(__file__).resolve().parents[1]
+
     models_dir = project_root / "models"
 
     models_dir.mkdir(
@@ -167,7 +215,9 @@ def main():
 
     labels, _ = prepare_labels(y)
 
-    print(f"Total sequences: {len(sequences)}")
+    print(
+        f"Total sequences: {len(sequences)}"
+    )
 
     # --------------------------------------------------
     # Train/test split
@@ -184,7 +234,9 @@ def main():
     # Classical Machine Learning
     # --------------------------------------------------
 
-    print("\nCreating k-mer features...")
+    print(
+        "\nCreating k-mer features..."
+    )
 
     X_train_kmer = kmer_features(
         sequences_train,
@@ -207,7 +259,9 @@ def main():
     # Logistic Regression
     # --------------------------------------------------
 
-    print("\nTraining Logistic Regression...")
+    print(
+        "\nTraining Logistic Regression..."
+    )
 
     logistic_model = LogisticRegression(
         max_iter=2000,
@@ -238,7 +292,9 @@ def main():
     # Random Forest
     # --------------------------------------------------
 
-    print("\nTraining Random Forest...")
+    print(
+        "\nTraining Random Forest..."
+    )
 
     random_forest = RandomForestClassifier(
         n_estimators=300,
@@ -270,7 +326,9 @@ def main():
     # Deep Learning
     # --------------------------------------------------
 
-    print("\nPreparing DNA sequences for CNN...")
+    print(
+        "\nPreparing DNA sequences for CNN..."
+    )
 
     X_train_cnn = one_hot_encode_sequences(
         sequences_train
@@ -285,7 +343,9 @@ def main():
         X_train_cnn.shape
     )
 
-    print("\nBuilding CNN...")
+    print(
+        "\nBuilding CNN..."
+    )
 
     cnn = build_cnn(
         input_shape=X_train_cnn.shape[1:],
@@ -300,7 +360,9 @@ def main():
         restore_best_weights=True
     )
 
-    print("\nTraining CNN...")
+    print(
+        "\nTraining CNN..."
+    )
 
     history = cnn.fit(
         X_train_cnn,
@@ -333,6 +395,46 @@ def main():
     )
 
     # --------------------------------------------------
+    # CNN Training Accuracy Plot
+    # --------------------------------------------------
+
+    plt.figure(
+        figsize=(10, 5)
+    )
+
+    plt.plot(
+        history.history["accuracy"],
+        label="Training Accuracy"
+    )
+
+    plt.plot(
+        history.history["val_accuracy"],
+        label="Validation Accuracy"
+    )
+
+    plt.xlabel(
+        "Epoch"
+    )
+
+    plt.ylabel(
+        "Accuracy"
+    )
+
+    plt.title(
+        "CNN Training and Validation Accuracy"
+    )
+
+    plt.legend()
+
+    plt.tight_layout()
+
+    plt.savefig(
+        models_dir / "cnn_accuracy.png"
+    )
+
+    plt.close()
+
+    # --------------------------------------------------
     # Save CNN
     # --------------------------------------------------
 
@@ -341,7 +443,29 @@ def main():
     )
 
     # --------------------------------------------------
-    # Save results
+    # Save Confusion Matrices
+    # --------------------------------------------------
+
+    plot_confusion_matrix(
+        results["logistic_regression"]["confusion_matrix"],
+        "Logistic Regression Confusion Matrix",
+        models_dir / "logistic_confusion_matrix.png"
+    )
+
+    plot_confusion_matrix(
+        results["random_forest"]["confusion_matrix"],
+        "Random Forest Confusion Matrix",
+        models_dir / "random_forest_confusion_matrix.png"
+    )
+
+    plot_confusion_matrix(
+        results["cnn"]["confusion_matrix"],
+        "1D CNN Confusion Matrix",
+        models_dir / "cnn_confusion_matrix.png"
+    )
+
+    # --------------------------------------------------
+    # Save Results
     # --------------------------------------------------
 
     results_path = models_dir / "results.json"
@@ -351,13 +475,16 @@ def main():
         "w",
         encoding="utf-8"
     ) as file:
+
         json.dump(
             results,
             file,
             indent=4
         )
 
-    print("\nTraining complete!")
+    print(
+        "\nTraining complete!"
+    )
 
     print(
         f"Models and results saved in: {models_dir}"
@@ -365,4 +492,4 @@ def main():
 
 
 if __name__ == "__main__":
-   
+    main()

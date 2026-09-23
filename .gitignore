@@ -16,7 +16,6 @@ data/processed/*
 !data/processed/.gitkeep
 
 # Trained models
-models/*.keras
 models/*.h5
 models/*.joblib
 
