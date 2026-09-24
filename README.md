@@ -1,123 +1,229 @@
-DNA Splice-Junction Classification
+# DNA Splice-Junction Classification
 
-A machine-learning and deep-learning project for classifying DNA splice-junction sequences into three biological classes: exon-intron (EI), intron-exon (IE), and neither (N).
+A machine learning and deep learning project for classifying DNA sequences around splice-junction sites into three biological categories:
 
-The project combines classical machine-learning methods, k-mer feature engineering, a 1D convolutional neural network, model evaluation, and a Streamlit web application.
+- EI — Exon-Intron
+- IE — Intron-Exon
+- N — Neither
 
-Project Overview
+The project uses the UCI Molecular Biology Splice Junction dataset and compares classical machine learning approaches with a 1D Convolutional Neural Network (CNN).
 
-Splice junctions are important regions in DNA where introns and exons meet during gene processing.
+## Overview
 
-This project uses the UCI Molecular Biology Splice Junction dataset to classify 60-base DNA sequences into three categories:
+Splice junctions are regions in DNA where exon and intron boundaries occur. Correctly identifying these regions is an important task in computational biology and bioinformatics.
 
-* EI — exon-intron boundary
-* IE — intron-exon boundary
-* N — neither
+This project explores how machine learning models can learn patterns from 60-base DNA sequences and classify them into three categories:
 
-The goal is to compare classical machine-learning approaches with a deep-learning approach for DNA sequence classification.
+| Class | Meaning |
+|---|---|
+| EI | Exon-Intron junction |
+| IE | Intron-Exon junction |
+| N | Neither |
 
-Objectives
+Three different approaches are implemented and compared:
 
-* Explore and preprocess DNA sequence data
-* Convert nucleotide sequences into machine-learning representations
-* Engineer 3-mer frequency features
-* Train classical machine-learning models
-* Train a 1D convolutional neural network
-* Compare model performance
-* Analyze classification errors using confusion matrices
-* Deploy the trained CNN through a Streamlit application
+1. Logistic Regression using k-mer features
+2. Random Forest using k-mer features
+3. 1D Convolutional Neural Network using one-hot encoded DNA sequences
 
-Models
+## Objectives
 
-The project evaluates three models:
+- Load and preprocess DNA sequence data.
+- Convert nucleotide sequences into machine-learning representations.
+- Build classical machine learning baselines.
+- Build a deep learning model using a 1D CNN.
+- Compare model performance using classification metrics.
+- Visualize confusion matrices.
+- Save the trained deep learning model.
+- Build an interactive web application for DNA sequence prediction.
+- Deploy the application publicly using Streamlit Community Cloud.
 
-1. Logistic Regression
+## Dataset
 
-Uses normalized 3-mer frequency features as input.
+The project uses the UCI Molecular Biology Splice Junction dataset.
 
-2. Random Forest
+Dataset source:
 
-Uses the same 3-mer representation while learning nonlinear decision boundaries through an ensemble of decision trees.
+UCI Machine Learning Repository  
+https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences
 
-3. 1D Convolutional Neural Network
+Dataset characteristics:
 
-Uses one-hot encoded DNA sequences and convolutional layers to learn local sequence patterns directly from the nucleotide sequence.
+- 3,190 DNA sequences
+- 60 nucleotide positions per sequence
+- 3 classification classes
+- EI: 767 samples
+- IE: 768 samples
+- N: 1,655 samples
+- License: CC BY 4.0
 
-Results
+The dataset contains DNA sequences surrounding splice-junction sites and is used as the basis for training and evaluating the models.
 
-Evaluation was performed on a held-out test set containing 20% of the dataset.
+## Feature Representation
 
-Model	Accuracy	Weighted F1
-Logistic Regression	54.70%	45.98%
-Random Forest	68.97%	67.49%
-1D CNN	81.50%	81.26%
+Two different representations are used.
 
-The 1D CNN achieved the highest test-set accuracy and weighted F1 score among the three evaluated models.
+### 1. K-mer Features
 
-These results correspond to the current train/test split and should not be interpreted as a guarantee of performance on other datasets.
+For the classical machine learning models, DNA sequences are transformed into normalized k-mer frequency vectors.
 
-Evaluation
+The project uses 3-mers.
 
-The project generates:
+For example:
 
-* CNN training and validation accuracy
-* Logistic Regression confusion matrix
-* Random Forest confusion matrix
-* 1D CNN confusion matrix
-* Classification metrics
-* Saved model evaluation results
+```text
+ATGCGT
+```
 
-CNN Training Accuracy
+can be represented through overlapping 3-mers:
 
-Logistic Regression Confusion Matrix
-
-Random Forest Confusion Matrix
-
-1D CNN Confusion Matrix
-
-Feature Representation
-
-Classical Machine Learning
-
-The classical models use normalized 3-mer frequency features.
-
-A 3-mer is a sequence of three consecutive nucleotides, such as:
-
+```text
 ATG
-CGA
-TTC
+TGC
+GCG
+CGT
+```
 
-All possible combinations of A, C, G, and T are represented as features.
+All possible combinations of A, C, G, and T are considered.
 
-Deep Learning
+For k = 3:
 
-The CNN uses one-hot encoding to represent each nucleotide:
+```text
+4^3 = 64
+```
 
-A → [1, 0, 0, 0]
-C → [0, 1, 0, 0]
-G → [0, 0, 1, 0]
-T → [0, 0, 0, 1]
+possible 3-mers are represented as numerical features.
 
-This produces a sequence representation suitable for convolutional neural networks.
+### 2. One-Hot Encoding
 
-Streamlit Application
+For the CNN model, each nucleotide is represented as a four-dimensional vector.
 
-The project includes an interactive Streamlit application.
+```text
+A = [1, 0, 0, 0]
+C = [0, 1, 0, 0]
+G = [0, 0, 1, 0]
+T = [0, 0, 0, 1]
+```
 
-Users can enter a 60-base DNA sequence and receive:
+A 60-base DNA sequence therefore becomes a numerical array with the shape:
 
-* Predicted class
-* Prediction confidence
-* Probability for each class
+```text
+60 × 4
+```
 
-The application uses the trained 1D CNN model.
+This representation allows the CNN to learn local sequence patterns directly from the nucleotide sequence.
 
-To launch the application locally:
+## Models
 
-python -m streamlit run app.py
+### Logistic Regression
 
-Project Structure
+Logistic Regression is used as a classical baseline.
 
+Input:
+
+- 3-mer frequency features
+
+Purpose:
+
+- Establish a simple baseline.
+- Provide a reference point for comparison with more complex models.
+
+### Random Forest
+
+Random Forest is used as a second classical machine learning model.
+
+Input:
+
+- 3-mer frequency features
+
+The model combines multiple decision trees to learn nonlinear relationships between DNA sequence features and the target classes.
+
+### 1D Convolutional Neural Network
+
+A 1D CNN is trained directly on one-hot encoded DNA sequences.
+
+The CNN is designed to learn local nucleotide patterns that may be useful for identifying splice-junction classes.
+
+The training process uses:
+
+- One-hot encoded sequences
+- Convolutional layers
+- Pooling
+- Dense layers
+- Early stopping
+- Validation monitoring
+
+## Results
+
+The models were evaluated on a held-out test set representing 20% of the dataset.
+
+| Model | Accuracy | Weighted Precision | Weighted Recall | Weighted F1 |
+|---|---:|---:|---:|---:|
+| Logistic Regression | 54.70% | 56.62% | 54.70% | 45.98% |
+| Random Forest | 68.97% | 70.78% | 68.97% | 67.49% |
+| 1D CNN | 81.50% | 81.40% | 81.50% | 81.26% |
+
+The CNN achieved 81.50% accuracy and a weighted F1 score of 81.26% on this particular test split.
+
+These results represent the current experimental setup and should not be interpreted as a general performance guarantee.
+
+## Evaluation
+
+### Logistic Regression Confusion Matrix
+
+![Logistic Regression Confusion Matrix](models/logistic_confusion_matrix.png)
+
+### Random Forest Confusion Matrix
+
+![Random Forest Confusion Matrix](models/random_forest_confusion_matrix.png)
+
+### CNN Confusion Matrix
+
+![CNN Confusion Matrix](models/cnn_confusion_matrix.png)
+
+### CNN Accuracy During Training
+
+![CNN Accuracy](models/cnn_accuracy.png)
+
+## Interactive Application
+
+The project includes a Streamlit application that allows users to enter a 60-base DNA sequence and receive a prediction from the trained CNN model.
+
+The application provides:
+
+- Predicted class
+- Prediction confidence
+- Probability for each class
+- Input validation
+
+## Live Demo
+
+[Launch the DNA Splice-Junction Predictor](https://eyaas848-dna-splice-junction-classification-app-ph3mho.streamlit.app/)
+
+The application is publicly deployed using Streamlit Community Cloud.
+
+## Example Prediction
+
+A user can enter a DNA sequence such as:
+
+```text
+ATGCGTACGTTAGCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGT
+```
+
+The application validates the sequence and sends it to the trained CNN model for classification.
+
+Example output from the deployed model:
+
+```text
+Prediction: Neither
+Confidence: 72.84%
+```
+
+The displayed prediction depends on the input sequence provided to the application.
+
+## Project Structure
+
+```text
 dna-splice-junction-classification/
 │
 ├── data/
@@ -140,12 +246,11 @@ dna-splice-junction-classification/
 │   └── predict.py
 │
 ├── models/
+│   ├── .gitkeep
 │   ├── cnn_accuracy.png
 │   ├── cnn_confusion_matrix.png
 │   ├── dna_splice_cnn.keras
 │   ├── logistic_confusion_matrix.png
-│   ├── logistic_regression.joblib
-│   ├── random_forest.joblib
 │   ├── random_forest_confusion_matrix.png
 │   └── results.json
 │
@@ -154,81 +259,206 @@ dna-splice-junction-classification/
 ├── README.md
 ├── .gitignore
 └── LICENSE
+```
 
-Dataset
+## Workflow
 
-The project uses the UCI Molecular Biology Splice Junction Gene Sequences dataset.
+The project follows this general workflow:
 
-Dataset characteristics:
-
-* 3,190 DNA sequences
-* 60 nucleotide positions per sequence
-* 3 classification classes
-* Classes: EI, IE, and N
-
-Source:
-
-UCI Machine Learning Repository — Molecular Biology (Splice-junction Gene Sequences)
-
-The dataset is used for educational and machine-learning research purposes.
-
-Technologies
-
-* Python
-* NumPy
-* Pandas
-* Scikit-learn
-* TensorFlow / Keras
-* Matplotlib
-* Seaborn
-* Joblib
-* Streamlit
-* UCI ML Repository
-
-Project Workflow
-
+```text
 UCI Dataset
-     ↓
-Data Loading
-     ↓
-DNA Sequence Construction
-     ↓
+     |
+     v
+Data Download
+     |
+     v
 Data Cleaning
-     ↓
-Train/Test Split
-     ↓
- ┌───────────────────────┐
- │                       │
- ▼                       ▼
-3-mer Features       One-Hot Encoding
- │                       │
- ▼                       ▼
+     |
+     v
+DNA Sequence Construction
+     |
+     +----------------------+
+     |                      |
+     v                      v
+3-mer Features        One-Hot Encoding
+     |                      |
+     v                      v
 Logistic Regression   1D CNN
-Random Forest            │
- │                       │
- └───────────┬───────────┘
-             ▼
-       Model Evaluation
-             ↓
-     Confusion Matrices
-             ↓
-       Results Analysis
-             ↓
-      Streamlit Application
+     |                      |
+     v                      v
+Random Forest         Evaluation
+     |                      |
+     +----------+-----------+
+                |
+                v
+        Model Comparison
+                |
+                v
+       Trained CNN Model
+                |
+                v
+        Streamlit Application
+                |
+                v
+           Live Deployment
+```
 
-Future Improvements
+## Installation
 
-Potential future extensions include:
+Clone the repository:
 
-* Macro-averaged evaluation metrics
-* ROC-AUC analysis
-* Hyperparameter optimization
-* More robust validation strategies
-* Additional sequence representations
-* Data-leakage analysis based on sequence similarity
-* Comparison with additional deep-learning architectures
-* Improved biological interpretation of learned sequence patterns
+```bash
+git clone https://github.com/eyaas848/dna-splice-junction-classification.git
+```
 
-Disclaimer
+Navigate into the project directory:
 
-This project is an educational machine-learning project and is not intended for medical or clinical use.
+```bash
+cd dna-splice-junction-classification
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment on Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Download the Dataset
+
+Run:
+
+```bash
+python src/download_data.py
+```
+
+This downloads the UCI Molecular Biology Splice Junction dataset and stores the raw feature and target files locally.
+
+## Training
+
+To train the models:
+
+```bash
+python src/train.py
+```
+
+The training script:
+
+- Loads and preprocesses the dataset.
+- Creates k-mer features.
+- Trains Logistic Regression.
+- Trains Random Forest.
+- Creates one-hot encoded sequences.
+- Builds and trains the 1D CNN.
+- Evaluates all models.
+- Generates confusion matrices.
+- Generates the CNN accuracy plot.
+- Saves the trained CNN model.
+- Saves the experimental results to `models/results.json`.
+
+## Running the Streamlit Application Locally
+
+After training the model, run:
+
+```bash
+streamlit run app.py
+```
+
+The application will open in your browser.
+
+The local application can then be used to enter DNA sequences and obtain predictions from the trained CNN.
+
+## Prediction
+
+The project also contains a prediction module:
+
+```text
+src/predict.py
+```
+
+The module:
+
+- Loads the trained CNN model.
+- Validates the DNA sequence.
+- Converts the sequence into the required numerical representation.
+- Generates class probabilities.
+- Returns the predicted class and confidence.
+
+The expected input is a DNA sequence containing exactly 60 bases.
+
+## Technologies
+
+The project was developed using:
+
+- Python
+- NumPy
+- Pandas
+- Scikit-learn
+- TensorFlow
+- Keras
+- Matplotlib
+- Streamlit
+- UCI Machine Learning Repository
+- Git
+- GitHub
+
+## Reproducibility
+
+The project uses a fixed random state for the train/test split:
+
+```text
+random_state = 42
+```
+
+The dataset is split into:
+
+```text
+80% training
+20% testing
+```
+
+Stratified splitting is used to preserve the class distribution between the training and testing sets.
+
+## Future Improvements
+
+Possible future improvements include:
+
+- Hyperparameter tuning.
+- Cross-validation.
+- More extensive CNN architectures.
+- Bidirectional recurrent neural networks.
+- Transformer-based sequence models.
+- Data augmentation techniques for DNA sequences.
+- More detailed per-class evaluation.
+- ROC and precision-recall curves.
+- Model interpretability techniques.
+- Comparison with additional bioinformatics approaches.
+- Improved Streamlit interface.
+- More extensive testing on independent datasets.
+
+## Disclaimer
+
+This project is an educational machine learning and bioinformatics project.
+
+The predictions produced by the application should not be interpreted as medical, clinical, or diagnostic advice.
+
+The model is trained and evaluated on the selected UCI dataset and its performance may not generalize to other biological datasets or real-world genomic applications.
+
+## Author
+
+Aya
+
+Computer Engineering Student
+
+Focus: Artificial Intelligence and Data Science
