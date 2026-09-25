@@ -460,5 +460,3 @@ The model is trained and evaluated on the selected UCI dataset and its performan
 Aya
 
 Computer Engineering Student
-
-Focus: Artificial Intelligence and Data Science
